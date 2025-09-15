@@ -3,81 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>私のクールなウェブサイト</title>
+    <title>冒険者の記録</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
+            font-family: 'Press Start 2P', cursive;
+            line-height: 1.8;
             margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            padding: 20px;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            background-image: url('IMG_0217.JPG');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
         }
         .container {
             max-width: 800px;
             margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 25px;
+            background-color: rgba(10, 20, 40, 0.85);
+            border: 4px solid #5a8dff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(90, 141, 255, 0.7);
+            position: relative;
+            z-index: 2;
         }
         header {
             text-align: center;
             padding-bottom: 20px;
-            border-bottom: 1px solid #eaeaea;
+            border-bottom: 2px solid #5a8dff;
         }
         header h1 {
-            font-size: 2.5em;
-            color: #333;
+            font-size: 2.2em;
+            color: #ffd700;
+            text-shadow: 3px 3px 0px #000;
             margin: 0;
         }
+        .character-image {
+            display: block;
+            width: 150px;
+            height: 150px;
+            margin: 20px auto;
+            border: 4px solid #ffd700;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 0 15px #ffd700;
+        }
         section {
-            margin-top: 20px;
+            margin-top: 25px;
         }
         h2 {
-            color: #007bff;
+            color: #5a8dff;
+            font-size: 1.5em;
+            border-bottom: 1px dashed #5a8dff;
+            padding-bottom: 5px;
         }
         ul {
             list-style-type: none;
             padding: 0;
         }
         li {
-            background: #e9ecef;
-            margin-bottom: 5px;
-            padding: 10px;
-            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            margin-bottom: 8px;
+            padding: 12px;
+            border-left: 4px solid #ffd700;
+            transition: all 0.3s ease;
+        }
+        li:hover {
+            background: rgba(90, 141, 255, 0.3);
+            transform: translateX(10px);
         }
         footer {
             text-align: center;
-            margin-top: 30px;
-            font-size: 0.9em;
-            color: #666;
+            margin-top: 40px;
+            font-size: 0.8em;
+            color: #aaa;
         }
     </style>
 </head>
 <body>
+    <div class="overlay"></div>
     <div class="container">
         <header>
-            <h1>私のクールなウェブサイト</h1>
+            <h1>冒険者の記録</h1>
         </header>
 
-        <section id="about">
-            <h2>自己紹介</h2>
-            <p>こんにちは！このウェブサイトへようこそ。私はWeb開発と新しい技術を学ぶことに情熱を注いでいます。</p>
+        <img src="IMG_0217.JPG" alt="キャラクター" class="character-image">
+
+        <section id="status">
+            <h2>ステータス</h2>
+            <p>ようこそ、冒険者よ。ここは君の記録を記す場所だ。これまでの旅路と、これからの目標を心に刻め。</p>
         </section>
 
-        <section id="hobbies">
-            <h2>趣味</h2>
+        <section id="skills">
+            <h2>スキル一覧</h2>
             <ul>
-                <li>読書</li>
-                <li>コーディング</li>
-                <li>旅行</li>
-                <li>写真</li>
+                <li>読書 (知識探求)</li>
+                <li>コーディング (魔法詠唱)</li>
+                <li>旅行 (世界探索)</li>
+                <li>写真 (記憶保存)</li>
             </ul>
         </section>
 
         <footer>
-            <p>&copy; 2025 私のウェブサイト</p>
+            <p>&copy; 2025 忘れられた王国の年代記</p>
         </footer>
     </div>
 </body>

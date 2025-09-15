@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>将棋ゲーム</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0e6d2;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            color: #5c3d2e;
+        }
+        #shogi-board {
+            display: grid;
+            grid-template-columns: repeat(9, 50px);
+            grid-template-rows: repeat(9, 50px);
+            border: 2px solid #5c3d2e;
+            background-color: #e3c16f;
+            width: 450px;
+            height: 450px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+        }
+        .square {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #9d8b7a;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            position: relative;
+        }
+        .piece {
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .piece.sente {
+            color: #000;
+        }
+        .piece.gote {
+            color: #b22222;
+            transform: rotate(180deg);
+        }
+        .selected {
+            background-color: rgba(255, 255, 0, 0.5);
+        }
+        .movable {
+            background-color: rgba(0, 255, 0, 0.3);
+        }
+        #info-panel {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #5c3d2e;
+        }
+        .home-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #5c3d2e;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .home-link:hover {
+            background-color: #7a5a49;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>将棋</h1>
+        <div id="shogi-board"></div>
+        <div id="info-panel">
+            <p>現在のターン: 先手</p>
+        </div>
+        <a href="index.html" class="home-link">冒険者の記録に戻る</a>
+    </div>
+
+    <script>
+        const boardElement = document.getElementById('shogi-board');
+        const infoPanel = document.getElementById('info-panel');
+        const PIECES = {
+            'FU': '歩', 'KY': '香', 'KE': '桂', 'GI': '銀', 'KI': '金', 'KA': '角', 'HI': '飛', 'OU': '王',
+            'TO': 'と', 'NY': '成香', 'NK': '成桂', 'NG': '成銀', 'UM': '馬', 'RY': '龍'
+        };
+
+        let board = [];
+        let currentPlayer = 'sente'; // 'sente' or 'gote'
+        let selectedPiece = null;
+
+        function initBoard() {
+            board = [
+                [{p:'KY',s:'gote'},{p:'KE',s:'gote'},{p:'GI',s:'gote'},{p:'KI',s:'gote'},{p:'OU',s:'gote'},{p:'KI',s:'gote'},{p:'GI',s:'gote'},{p:'KE',s:'gote'},{p:'KY',s:'gote'}],
+                [null,{p:'HI',s:'gote'},null,null,null,null,null,{p:'KA',s:'gote'},null],
+                [{p:'FU',s:'gote'},{p:'FU',s:'gote'},{p:'FU',s:'gote'},{p:'FU',s:'gote'},{p:'FU',s:'gote'},{p:'FU',s:'gote'},{p:'FU',s:'gote'},{p:'FU',s:'gote'},{p:'FU',s:'gote'}],
+                [null,null,null,null,null,null,null,null,null],
+                [null,null,null,null,null,null,null,null,null],
+                [null,null,null,null,null,null,null,null,null],
+                [{p:'FU',s:'sente'},{p:'FU',s:'sente'},{p:'FU',s:'sente'},{p:'FU',s:'sente'},{p:'FU',s:'sente'},{p:'FU',s:'sente'},{p:'FU',s:'sente'},{p:'FU',s:'sente'},{p:'FU',s:'sente'}],
+                [null,{p:'KA',s:'sente'},null,null,null,null,null,{p:'HI',s:'sente'},null],
+                [{p:'KY',s:'sente'},{p:'KE',s:'sente'},{p:'GI',s:'sente'},{p:'KI',s:'sente'},{p:'OU',s:'sente'},{p:'KI',s:'sente'},{p:'GI',s:'sente'},{p:'KE',s:'sente'},{p:'KY',s:'sente'}],
+            ];
+            renderBoard();
+        }
+
+        function renderBoard() {
+            boardElement.innerHTML = '';
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const square = document.createElement('div');
+                    square.classList.add('square');
+                    square.dataset.row = r;
+                    square.dataset.col = c;
+
+                    const pieceData = board[r][c];
+                    if (pieceData) {
+                        const pieceElement = document.createElement('div');
+                        pieceElement.classList.add('piece', pieceData.s);
+                        pieceElement.innerText = PIECES[pieceData.p];
+                        square.appendChild(pieceElement);
+                    }
+                    square.addEventListener('click', onSquareClick);
+                    boardElement.appendChild(square);
+                }
+            }
+            updateInfo();
+        }
+        
+        function onSquareClick(e) {
+            const square = e.currentTarget;
+            const row = parseInt(square.dataset.row);
+            const col = parseInt(square.dataset.col);
+            const piece = board[row][col];
+
+            if (selectedPiece) {
+                // Move piece
+                const fromRow = selectedPiece.row;
+                const fromCol = selectedPiece.col;
+                
+                // Basic move logic (no rule validation yet)
+                if (isValidMove(fromRow, fromCol, row, col)) {
+                    board[row][col] = board[fromRow][fromCol];
+                    board[fromRow][fromCol] = null;
+                    
+                    // Basic promotion
+                    promoteIfPossible(row, col);
+
+                    switchPlayer();
+                }
+                
+                selectedPiece = null;
+                clearHighlights();
+                renderBoard();
+
+            } else if (piece && piece.s === currentPlayer) {
+                // Select piece
+                selectedPiece = { piece, row, col };
+                clearHighlights();
+                square.classList.add('selected');
+                highlightMovableSquares(row, col);
+            }
+        }
+
+        function isValidMove(fromRow, fromCol, toRow, toCol) {
+            // This is a very simplified move validation.
+            // It just checks if the destination is not occupied by a friendly piece.
+            const targetPiece = board[toRow][toCol];
+            if (targetPiece && targetPiece.s === currentPlayer) {
+                return false;
+            }
+            // A proper implementation would check piece-specific move rules.
+            return true;
+        }
+
+        function promoteIfPossible(row, col) {
+            const piece = board[row][col];
+            if (!piece) return;
+
+            const canPromote = ['FU', 'KY', 'KE', 'GI', 'KA', 'HI'].includes(piece.p);
+            if (!canPromote) return;
+
+            if (piece.s === 'sente' && row <= 2) {
+                if (confirm('成りますか？')) {
+                    promote(piece);
+                }
+            } else if (piece.s === 'gote' && row >= 6) {
+                 if (confirm('成りますか？')) {
+                    promote(piece);
+                }
+            }
+        }
+
+        function promote(piece) {
+            if (piece.p === 'FU') piece.p = 'TO';
+            else if (piece.p === 'KY') piece.p = 'NY';
+            else if (piece.p === 'KE') piece.p = 'NK';
+            else if (piece.p === 'GI') piece.p = 'NG';
+            else if (piece.p === 'KA') piece.p = 'UM';
+            else if (piece.p === 'HI') piece.p = 'RY';
+        }
+
+        function switchPlayer() {
+            currentPlayer = (currentPlayer === 'sente') ? 'gote' : 'sente';
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('.square').forEach(s => {
+                s.classList.remove('selected', 'movable');
+            });
+        }
+
+        function highlightMovableSquares(row, col) {
+            // This is a placeholder. A real implementation would calculate valid moves.
+            for(let r=0; r<9; r++) {
+                for(let c=0; c<9; c++) {
+                    if (isValidMove(row, col, r, c)) {
+                        const sq = boardElement.querySelector(`[data-row='${r}'][data-col='${c}']`);
+                        if(sq) sq.classList.add('movable');
+                    }
+                }
+            }
+        }
+
+        function updateInfo() {
+            infoPanel.innerHTML = `<p>現在のターン: ${currentPlayer === 'sente' ? '先手' : '後手'}</p>`;
+        }
+
+        initBoard();
+    </script>
+</body>
+</html>
